@@ -1,11 +1,12 @@
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import { useCallback, useMemo, useRef } from "react";
 import * as THREE from 'three';
 
 export function Particles() {
   const texture = new THREE.TextureLoader().load('/images/circle.png')
   const bufferRef = useRef(null);
-  const COUNT = 100
+  const particlesRef = useRef(null);
+  const COUNT = 60
   const SEP = 3
   
   let t = 0;
@@ -32,7 +33,6 @@ export function Particles() {
   useFrame(() => {
     t += 10;
     const positions = bufferRef.current.array;
-
     let i = 0;
     for(let xi = 0; xi < COUNT; xi++) {
       for(let zi = 0; zi < COUNT; zi++) {
@@ -42,11 +42,12 @@ export function Particles() {
         i += 3;
       }
     }
+    particlesRef.current.rotation.y += 0.0005;
     bufferRef.current.needsUpdate = true;
   })
 
   return(
-    <points rotation={[0, 0.3 * Math.PI, 0]} position={[0, -8, 0]}>
+    <points ref={particlesRef} rotation={[0, 0.3 * Math.PI, 0]} position={[0, -8, 0]}>
       <bufferGeometry attach="geometry">
         <bufferAttribute
           ref={bufferRef}

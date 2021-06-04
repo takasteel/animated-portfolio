@@ -1,7 +1,7 @@
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { gsap } from 'gsap';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Particles } from '../Particles';
 
 import styles from './styles.module.scss';
@@ -13,6 +13,8 @@ export function About() {
   let hover_02 = useRef(null);
   let title_03 = useRef(null);
   let hover_03 = useRef(null);
+
+  const [isMobile, setIsMobile] = useState(false);
 
   const tl = gsap.timeline({repeat: -1, defaults: {ease: "sine.out"}});
 
@@ -29,6 +31,12 @@ export function About() {
       .to(title_03.current, { delay: 0.2, opacity: 1, duration: 0 })
       .to(hover_03.current, { delay: 0.5, height: 0, duration: 1 })
       .to(title_03.current, { delay: 0.2, opacity: 0 })
+  }, [])
+
+  useEffect(() => {
+    if (window.innerWidth < 769) {
+      setIsMobile(true);
+    }
   }, [])
 
   return(
@@ -64,9 +72,8 @@ export function About() {
         </div>
         <div className={styles.canvas}>
           <Canvas>
-            {/* <spotLight intensity={0.5} angle={0.5} penumbra={1} position={[10, 15, 10]} castShadow /> */}
             <Particles />
-            <OrbitControls enablePan={false} enableZoom={false} rotateSpeed={0.5} />
+            <OrbitControls enablePan={false} enableZoom={false} enableRotate={!isMobile} rotateSpeed={0.5} />
           </Canvas>
         </div>
       </section>
