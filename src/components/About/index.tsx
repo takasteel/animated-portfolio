@@ -1,4 +1,4 @@
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { gsap } from 'gsap';
 import { useEffect, useRef } from 'react';
@@ -64,9 +64,9 @@ export function About() {
         </div>
         <div className={styles.canvas}>
           <Canvas>
-          <spotLight intensity={0.5} angle={0.5} penumbra={1} position={[10, 15, 10]} castShadow />
-          <Particles />
-          <OrbitControls />
+            {/* <spotLight intensity={0.5} angle={0.5} penumbra={1} position={[10, 15, 10]} castShadow /> */}
+            <Particles />
+            <OrbitControls enablePan={false} enableZoom={false} rotateSpeed={0.5} />
           </Canvas>
         </div>
       </section>

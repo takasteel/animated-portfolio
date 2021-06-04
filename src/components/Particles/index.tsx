@@ -1,27 +1,71 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { useCallback, useMemo, useRef } from "react";
+import * as THREE from 'three';
 
 export function Particles() {
+  const texture = new THREE.TextureLoader().load('/images/circle.png')
+  const bufferRef = useRef(null);
+  const COUNT = 100
+  const SEP = 3
+  
+  let t = 0;
+  let f = 0.003;
+  let a = 1.5 ;
+
+  const graph = useCallback((x, z) => {
+    return Math.sin(f * (x ** 2 + z ** 2 + t)) * a;
+  }, [t, f, a])
+
+  let positions = useMemo(() => {
+    let positions = []
+    for(let xi = 0; xi < COUNT; xi++) {
+      for(let zi = 0; zi < COUNT; zi++) {
+        let x = SEP * (xi - COUNT / 2);
+        let z = SEP * (zi - COUNT / 2);
+        let y = graph(x,z);
+        positions.push(x, y, z);
+      }
+    }
+    return new Float32Array(positions)
+  }, [COUNT, SEP, graph])
+  
+  useFrame(() => {
+    t += 10;
+    const positions = bufferRef.current.array;
+
+    let i = 0;
+    for(let xi = 0; xi < COUNT; xi++) {
+      for(let zi = 0; zi < COUNT; zi++) {
+        let x = SEP * (xi - COUNT / 2);
+        let z = SEP * (zi - COUNT / 2);
+        positions[i+1] = graph(x ,z);
+        i += 3;
+      }
+    }
+    bufferRef.current.needsUpdate = true;
+  })
+
   return(
-    <>
-    </>
-  );
-  // const meshRef = useRef(null);
-  // const particles = 100;
-
-  // const SEPARATION = 100, AMOUNTX = 50, AMOUNTY = 50;
-
-  // useFrame((state) => {
-  //   const time = state.clock.getElapsedTime()
-  //   meshRef.current.position.x = Math.sin(time / 4)
-
-  // })
-  // return(
-  //   <instancedMesh ref={meshRef} args={[10, 10, 50]}>
-  //     <sphereGeometry args={[5, 32, 32]}>
-
-  //     </sphereGeometry>
-  //     <meshBasicMaterial/>
-  //   </instancedMesh>
-  // ); 
+    <points rotation={[0, 0.3 * Math.PI, 0]} position={[0, -8, 0]}>
+      <bufferGeometry attach="geometry">
+        <bufferAttribute
+          ref={bufferRef}
+          attachObject={['attributes', 'position']}
+          array={positions}
+          count={positions.length / 3}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <pointsMaterial 
+        attach="material"
+        map={texture}
+        color={0x706e09}
+        size={0.5}
+        sizeAttenuation
+        transparent={false}
+        alphaTest={0.5}
+        opacity={1.0}
+      />
+    </points>
+  ); 
 }
